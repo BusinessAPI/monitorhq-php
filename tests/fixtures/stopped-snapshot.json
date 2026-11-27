@@ -1,0 +1,24 @@
+{
+  "data": {
+    "uuid": "123e4567-e89b-12d3-a456-426614174000",
+    "risk_level": "low",
+    "added_at": "2026-01-15T10:00:00Z",
+    "last_checked_at": null,
+    "consecutive_failures": null,
+    "acn_last_checked_at": null,
+    "abn_last_checked_at": null,
+    "acn_consecutive_failures": null,
+    "abn_consecutive_failures": null,
+    "entity_state": null,
+    "entity_details": {
+      "entity_name": "Example Pty Ltd"
+    },
+    "trade_marks": null,
+    "trade_marks_synced_at": null,
+    "registrations": null,
+    "registrations_updated_at": null,
+    "insolvency_notices": null,
+    "ppsr": null,
+    "recent_history": []
+  }
+}

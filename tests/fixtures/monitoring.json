@@ -1,0 +1,24 @@
+{
+  "uuid": "123e4567-e89b-12d3-a456-426614174000",
+  "entity_name": "Example Pty Ltd",
+  "entity_type": "APTY",
+  "acn": "123456789",
+  "abn": "12345678901",
+  "risk_level": "high",
+  "added_at": "2026-01-15T10:00:00Z",
+  "last_checked_at": "2026-01-16T03:12:00+00:00",
+  "consecutive_failures": 0,
+  "acn_last_checked_at": "2026-01-16T03:12:00+00:00",
+  "abn_last_checked_at": "2026-01-14T22:05:00+00:00",
+  "acn_consecutive_failures": 0,
+  "abn_consecutive_failures": 1,
+  "entity_state": {
+    "entity_type": "PRV",
+    "acn_status": "REGD",
+    "abn_status": "Active",
+    "gst_registered": true,
+    "gst_date": "2020-01-15",
+    "business_names": [],
+    "is_terminal": false
+  }
+}

@@ -1,0 +1,258 @@
+{
+  "description": "Webhook signature vectors for MonitorHQ. header = t={unix},v1={hex hmac_sha256(secret, '{t}.{body}')}. A verifier must return `expected` given secret, body, header, now (unix seconds) and tolerance (seconds). Computed independently with Python hmac.",
+  "cases": [
+    {
+      "name": "valid",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1042,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "t=1793000000,v1=099a96459ecc5b0b865d2fc61ddd29f2840dc118f1bfe9ac32e100e3b2fac70d",
+      "now": 1793000000,
+      "tolerance": 300,
+      "expected": true,
+      "note": ""
+    },
+    {
+      "name": "valid_at_exact_tolerance_edge",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1042,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "t=1793000000,v1=099a96459ecc5b0b865d2fc61ddd29f2840dc118f1bfe9ac32e100e3b2fac70d",
+      "now": 1793000300,
+      "tolerance": 300,
+      "expected": true,
+      "note": ""
+    },
+    {
+      "name": "valid_uppercase_hex",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1042,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "t=1793000000,v1=099A96459ECC5B0B865D2FC61DDD29F2840DC118F1BFE9AC32E100E3B2FAC70D",
+      "now": 1793000000,
+      "tolerance": 300,
+      "expected": true,
+      "note": "hex is compared case-insensitively"
+    },
+    {
+      "name": "valid_extra_scheme_ignored",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1042,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "t=1793000000,v1=099a96459ecc5b0b865d2fc61ddd29f2840dc118f1bfe9ac32e100e3b2fac70d,v2=0000000000000000000000000000000000000000000000000000000000000000",
+      "now": 1793000000,
+      "tolerance": 300,
+      "expected": true,
+      "note": "unknown schemes are ignored"
+    },
+    {
+      "name": "valid_spaces_after_commas",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1042,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "t=1793000000, v1=099a96459ecc5b0b865d2fc61ddd29f2840dc118f1bfe9ac32e100e3b2fac70d",
+      "now": 1793000000,
+      "tolerance": 300,
+      "expected": true,
+      "note": ""
+    },
+    {
+      "name": "multiple_v1_second_matches",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1042,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "t=1793000000,v1=0000000000000000000000000000000000000000000000000000000000000000,v1=099a96459ecc5b0b865d2fc61ddd29f2840dc118f1bfe9ac32e100e3b2fac70d",
+      "now": 1793000000,
+      "tolerance": 300,
+      "expected": true,
+      "note": ""
+    },
+    {
+      "name": "multiple_v1_first_matches",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1042,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "t=1793000000,v1=099a96459ecc5b0b865d2fc61ddd29f2840dc118f1bfe9ac32e100e3b2fac70d,v1=0000000000000000000000000000000000000000000000000000000000000000",
+      "now": 1793000000,
+      "tolerance": 300,
+      "expected": true,
+      "note": ""
+    },
+    {
+      "name": "multiple_v1_none_match",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1042,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "t=1793000000,v1=0000000000000000000000000000000000000000000000000000000000000000,v1=ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "now": 1793000000,
+      "tolerance": 300,
+      "expected": false,
+      "note": ""
+    },
+    {
+      "name": "tampered_body",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1043,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "t=1793000000,v1=099a96459ecc5b0b865d2fc61ddd29f2840dc118f1bfe9ac32e100e3b2fac70d",
+      "now": 1793000000,
+      "tolerance": 300,
+      "expected": false,
+      "note": ""
+    },
+    {
+      "name": "reencoded_body_with_whitespace",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\": \"change_detected\", \"uuid\": \"123e4567-e89b-12d3-a456-426614174000\", \"entity_name\": \"EXAMPLE PTY LTD\", \"acn\": \"005443292\", \"abn\": \"80005443292\", \"events\": [{\"history_id\": 1042, \"title\": \"Status changed\", \"description\": \"EXAMPLE PTY LTD: status changed\", \"event_type\": \"status_change\", \"effective_date\": \"2026-10-28T00:00:00.000000Z\", \"source\": \"asic\", \"initial\": false, \"metadata\": []}], \"detected_at\": \"2026-10-27T20:20:14+00:00\", \"delivery_id\": 5531}",
+      "header": "t=1793000000,v1=099a96459ecc5b0b865d2fc61ddd29f2840dc118f1bfe9ac32e100e3b2fac70d",
+      "now": 1793000000,
+      "tolerance": 300,
+      "expected": false,
+      "note": "re-serialising the JSON changes the bytes"
+    },
+    {
+      "name": "wrong_secret",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1042,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "t=1793000000,v1=8592fcf3aaa408951b1296614a58fe1cc3b1955138c670266c80c289d47a6eff",
+      "now": 1793000000,
+      "tolerance": 300,
+      "expected": false,
+      "note": ""
+    },
+    {
+      "name": "tampered_timestamp_in_header",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1042,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "t=1793000001,v1=099a96459ecc5b0b865d2fc61ddd29f2840dc118f1bfe9ac32e100e3b2fac70d",
+      "now": 1793000000,
+      "tolerance": 300,
+      "expected": false,
+      "note": ""
+    },
+    {
+      "name": "expired_timestamp",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1042,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "t=1793000000,v1=099a96459ecc5b0b865d2fc61ddd29f2840dc118f1bfe9ac32e100e3b2fac70d",
+      "now": 1793000301,
+      "tolerance": 300,
+      "expected": false,
+      "note": ""
+    },
+    {
+      "name": "future_timestamp",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1042,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "t=1793000000,v1=099a96459ecc5b0b865d2fc61ddd29f2840dc118f1bfe9ac32e100e3b2fac70d",
+      "now": 1792999699,
+      "tolerance": 300,
+      "expected": false,
+      "note": ""
+    },
+    {
+      "name": "stale_but_tolerance_widened",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1042,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "t=1793000000,v1=099a96459ecc5b0b865d2fc61ddd29f2840dc118f1bfe9ac32e100e3b2fac70d",
+      "now": 1793003600,
+      "tolerance": 7200,
+      "expected": true,
+      "note": ""
+    },
+    {
+      "name": "malformed_missing_v1",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1042,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "t=1793000000",
+      "now": 1793000000,
+      "tolerance": 300,
+      "expected": false,
+      "note": ""
+    },
+    {
+      "name": "malformed_missing_t",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1042,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "v1=099a96459ecc5b0b865d2fc61ddd29f2840dc118f1bfe9ac32e100e3b2fac70d",
+      "now": 1793000000,
+      "tolerance": 300,
+      "expected": false,
+      "note": ""
+    },
+    {
+      "name": "malformed_non_numeric_t",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1042,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "t=abc,v1=099a96459ecc5b0b865d2fc61ddd29f2840dc118f1bfe9ac32e100e3b2fac70d",
+      "now": 1793000000,
+      "tolerance": 300,
+      "expected": false,
+      "note": ""
+    },
+    {
+      "name": "malformed_duplicate_t",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1042,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "t=1793000000,t=1793000000,v1=099a96459ecc5b0b865d2fc61ddd29f2840dc118f1bfe9ac32e100e3b2fac70d",
+      "now": 1793000000,
+      "tolerance": 300,
+      "expected": false,
+      "note": ""
+    },
+    {
+      "name": "malformed_garbage",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1042,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "not a signature",
+      "now": 1793000000,
+      "tolerance": 300,
+      "expected": false,
+      "note": ""
+    },
+    {
+      "name": "empty_header",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1042,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "",
+      "now": 1793000000,
+      "tolerance": 300,
+      "expected": false,
+      "note": ""
+    },
+    {
+      "name": "empty_v1_value",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1042,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "t=1793000000,v1=",
+      "now": 1793000000,
+      "tolerance": 300,
+      "expected": false,
+      "note": ""
+    },
+    {
+      "name": "truncated_signature",
+      "secret": "whsec_test_0123456789abcdef",
+      "timestamp": 1793000000,
+      "body": "{\"event\":\"change_detected\",\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\",\"entity_name\":\"EXAMPLE PTY LTD\",\"acn\":\"005443292\",\"abn\":\"80005443292\",\"events\":[{\"history_id\":1042,\"title\":\"Status changed\",\"description\":\"EXAMPLE PTY LTD: status changed\",\"event_type\":\"status_change\",\"effective_date\":\"2026-10-28T00:00:00.000000Z\",\"source\":\"asic\",\"initial\":false,\"metadata\":[]}],\"detected_at\":\"2026-10-27T20:20:14+00:00\",\"delivery_id\":5531}",
+      "header": "t=1793000000,v1=099a96459ecc5b0b865d2fc61ddd29f2",
+      "now": 1793000000,
+      "tolerance": 300,
+      "expected": false,
+      "note": ""
+    }
+  ]
+}

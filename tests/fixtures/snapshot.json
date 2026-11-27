@@ -1,0 +1,76 @@
+{
+  "data": {
+    "uuid": "123e4567-e89b-12d3-a456-426614174000",
+    "risk_level": "high",
+    "added_at": "2026-01-15T10:00:00Z",
+    "last_checked_at": "2026-01-16T03:12:00+00:00",
+    "consecutive_failures": 0,
+    "acn_last_checked_at": "2026-01-16T03:12:00+00:00",
+    "abn_last_checked_at": "2026-01-14T22:05:00+00:00",
+    "acn_consecutive_failures": 0,
+    "abn_consecutive_failures": 0,
+    "entity_state": {
+      "entity_type": "PRV",
+      "acn_status": "REGD",
+      "abn_status": "Active",
+      "gst_registered": true,
+      "gst_date": "2020-01-15",
+      "business_names": [],
+      "is_terminal": false
+    },
+    "entity_details": {
+      "entity_name": "Example Pty Ltd",
+      "entity_type": "APTY",
+      "acn": "123456789",
+      "abn": "12345678901",
+      "state": "VIC",
+      "primary_address": {
+        "state": "VIC",
+        "locality": "MELBOURNE",
+        "postCode": "3000"
+      },
+      "business_names": [],
+      "former_names": []
+    },
+    "trade_marks": [
+      {
+        "number": "2082595",
+        "words": "Video HQ",
+        "status": "Registered",
+        "classes": [
+          "9",
+          "42"
+        ]
+      }
+    ],
+    "trade_marks_synced_at": "2026-10-27T18:00:00+00:00",
+    "registrations": [
+      {
+        "register": "credit_licence",
+        "status": "APPR",
+        "is_current": true
+      }
+    ],
+    "registrations_updated_at": "2026-10-28T05:00:00+00:00",
+    "insolvency_notices": [],
+    "ppsr": {
+      "monitored": true,
+      "status": "active",
+      "organisation_number_type": "ACN",
+      "since": "2026-01-15T10:00:00+00:00"
+    },
+    "recent_history": [
+      {
+        "history_id": 1042,
+        "type": "abn_registration",
+        "source": "abr",
+        "initial": true,
+        "effective_date": "2020-01-15T00:00:00Z",
+        "detected_at": "2026-01-15T10:00:00+00:00",
+        "title": "ABN Registered",
+        "description": "Australian Business Number registered",
+        "metadata": []
+      }
+    ]
+  }
+}

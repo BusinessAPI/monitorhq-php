@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2 - 2026-11-27
+
+- Publish tests and CI config in the repository
+
 ## 1.0.1 - 2026-11-27
 
 - Add CI workflow
