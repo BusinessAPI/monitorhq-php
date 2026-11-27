@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1 - 2026-11-27
+
+- Add CI workflow
+
 ## 1.0.0 - 2026-11-27
 
 - Client for every `/api/v1` route.
